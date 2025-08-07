@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dreamscape Game</title>
-  <link rel="icon" href="favicon.ico" />
+  <link rel="icon" href="assets/favicon.ico" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -15,7 +15,7 @@
     <button onclick="showCredits()">Credits</button>
   </div>
 
-  <div id="game-screen" class="screen" style="display: none;">
+  <div id="game-screen" class="screen hidden">
     <audio id="bgm" src="assets/audio/bgm.mp3" loop autoplay></audio>
     <button onclick="toggleMute()" id="mute-btn">🔊</button>
     <div id="scene">
@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <div id="instructions-screen" class="screen" style="display: none;">
+  <div id="instructions-screen" class="screen hidden">
     <h2>How to Play</h2>
     <ul>
       <li>Click objects to interact</li>
@@ -35,14 +35,121 @@
     <button onclick="backToStart()">Back</button>
   </div>
 
-  <div id="credits-screen" class="screen" style="display: none;">
+  <div id="credits-screen" class="screen hidden">
     <h2>Credits</h2>
     <p>Developed by Viashany</p>
     <p>Powered by AI ✨</p>
     <button onclick="backToStart()">Back</button>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const bgm = document.getElementById('bgm');
+    const muteBtn = document.getElementById('mute-btn');
+
+    function startGame() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      bgm.play();
+    }
+
+    function showInstructions() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('instructions-screen').classList.remove('hidden');
+    }
+
+    function showCredits() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('credits-screen').classList.remove('hidden');
+    }
+
+    function backToStart() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+      document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    function toggleMute() {
+      if (bgm.muted) {
+        bgm.muted = false;
+        muteBtn.textContent = '🔊';
+      } else {
+        bgm.muted = true;
+        muteBtn.textContent = '🔇';
+      }
+    }
+
+    function nextScene() {
+      document.getElementById('scene').innerHTML = `
+        <h2>Mission 1: Bank</h2>
+        <p>Complete the simple interest puzzle to recover RoboBit’s first part.</p>
+        <button onclick="loadPuzzle()">Start Puzzle</button>
+      `;
+    }
+
+    function loadPuzzle() {
+      document.getElementById('scene').innerHTML = `
+        <h2>Simple Interest Puzzle</h2>
+        <p>Find the interest for: Principal = RM1000, Rate = 5%, Time = 2 years</p>
+        <input type="text" id="answer" placeholder="Your answer"> <button onclick="checkAnswer()">Submit</button>
+        <div id="result"></div>
+      `;
+    }
+
+    function checkAnswer() {
+      const ans = document.getElementById('answer').value;
+      const result = document.getElementById('result');
+      if (ans.trim() === "100") {
+        result.innerHTML = "✅ Correct! You’ve collected a robot part!";
+      } else {
+        result.innerHTML = "❌ Try again.";
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #0b0c2a;
+      color: #fff;
+      text-align: center;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    button {
+      background: #1e90ff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+    input[type=text] {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin: 10px;
+    }
+    #mute-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </body>
 </html>
- 
