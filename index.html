@@ -1,2 +1,48 @@
-<!-- Dreamscape Game HTML -->
-<html><head><title>Dreamscape Game</title></head><body><h1>Dreamscape Game Loaded</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dreamscape Game</title>
+  <link rel="icon" href="favicon.ico" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="start-screen" class="screen">
+    <h1>Dreamscape</h1>
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="showInstructions()">Instructions</button>
+    <button onclick="showCredits()">Credits</button>
+  </div>
+
+  <div id="game-screen" class="screen" style="display: none;">
+    <audio id="bgm" src="assets/audio/bgm.mp3" loop autoplay></audio>
+    <button onclick="toggleMute()" id="mute-btn">🔊</button>
+    <div id="scene">
+      <h2>Welcome to Dreamscape!</h2>
+      <p>RoboBit has crash-landed. Help Aira find the robot parts.</p>
+      <button onclick="nextScene()">Continue</button>
+    </div>
+  </div>
+
+  <div id="instructions-screen" class="screen" style="display: none;">
+    <h2>How to Play</h2>
+    <ul>
+      <li>Click objects to interact</li>
+      <li>Answer puzzles to progress</li>
+      <li>Collect robot parts to win</li>
+    </ul>
+    <button onclick="backToStart()">Back</button>
+  </div>
+
+  <div id="credits-screen" class="screen" style="display: none;">
+    <h2>Credits</h2>
+    <p>Developed by Viashany</p>
+    <p>Powered by AI ✨</p>
+    <button onclick="backToStart()">Back</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+ 
