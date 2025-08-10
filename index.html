@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>My Quiz Presentation Game</title>
@@ -86,7 +86,7 @@ function startTimer() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    t.textContent = Time: ${elapsed}s;
+    t.textContent = `Time: ${elapsed}s`;
   }, 100);
 }
 
@@ -168,5 +168,3 @@ window.addEventListener("message", (e) => {
 
 </body>
 </html>
-
-
