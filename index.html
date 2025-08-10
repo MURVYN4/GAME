@@ -1,216 +1,169 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Robo Guide Chatbot</title>
+  <title>My Quiz Presentation Game</title>
   <style>
-    body {
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      overflow: hidden; background-color: #000;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
-    .chat-container {
-      width: 380px;
-      height: 600px;
-      background: white;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    #loginScreen, #leaderboard {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      height: 100%; width: 100%; background: #111; color: white;
+      position: absolute; top: 0; left: 0;
     }
-    .chat-header {
-      background: #0078ff;
-      color: white;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
+    #gameScreen {
+      display: none;
+      height: 100%; width: 100%;
+      position: absolute; top: 0; left: 0;
     }
-    .chat-messages {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-      background: #f9f9f9;
-      display: flex;
-      flex-direction: column;
+    iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
     }
-    .message {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 8px;
-      max-width: 80%;
-      word-wrap: break-word;
+    input, button { padding: 10px; font-size: 16px; margin: 5px; }
+    table { border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid white; padding: 8px; }
+    th { background: #333; }
+    /* Overlays */
+    #finishBtn { position: absolute; top: 10px; right: 10px; padding: 10px; z-index: 10; }
+    #timerDisplay {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.7); color: #fff;
+      padding: 8px 12px; border-radius: 8px; font-size: 18px; z-index: 10;
     }
-    .message.sent {
-      background: #0078ff;
-      color: white;
-      align-self: flex-end;
-    }
-    .message.received {
-      background: #e0e0e0;
-      align-self: flex-start;
-    }
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 10px;
-      border-top: 1px solid #ccc;
-      background: #fff;
-    }
-    .options button, .question-button {
-      flex: 1 1 calc(50% - 5px);
-      background: #0078ff;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    .options button:hover, .question-button:hover {
-      background: #005ec2;
-    }
-    .question-button {
-      margin: 5px 0;
-      display: inline-block;
+    /* Fallback manual trigger (optional) */
+    #startTimerBtn {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 11;
+      background: #39d6f4; color: #001018; border: none; cursor: pointer;
+      font-weight: 700; border-radius: 8px; box-shadow: 0 4px 0 #0a2c36;
     }
   </style>
 </head>
 <body>
 
-<div class="chat-container">
-  <div class="chat-header">Robo Guide Chatbot</div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="message received">Hi! Choose a topic below to get started.</div>
-  </div>
-  <div class="options" id="mainOptions">
-    <button onclick="chooseTopic('Simple Interest')">📈 Simple Interest</button>
-    <button onclick="chooseTopic('Compound Interest')">💹 Compound Interest</button>
-    <button onclick="chooseTopic('Return on Investment (ROI)')">💵 Return on Investment (ROI)</button>
-    <button onclick="chooseTopic('Cost per Saving (CPS)')">💰 Cost per Saving (CPS)</button>
-    <button onclick="chooseTopic('Game & Support')">🎮 Game & Support</button>
-  </div>
+<!-- Login Screen -->
+<div id="loginScreen">
+  <h1>Enter Your Name to Start</h1>
+  <input type="text" id="username" placeholder="Your name">
+  <button onclick="startGame()">Enter</button>
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <!-- Fallback Start button (you can delete if you’ll only use iSpring trigger) -->
+  <button id="startTimerBtn" title="Fallback: start timer manually">Start Timer</button>
+
+  <!-- Live timer -->
+  <div id="timerDisplay">Time: 0.0s</div>
+
+  <!-- Your iSpring/Office iframe -->
+  <iframe src="https://pisedumy-my.sharepoint.com/personal/09dem22f1022_student_pis_edu_my/_layouts/15/Doc.aspx?sourcedoc={a45aad04-6600-4f59-9b46-978b1047ba33}&amp;action=embedview&amp;wdAr=1.7777777777777777" width="476px" height="288px" frameborder="0">This is an embedded <a target="_blank" href="https://office.com">Microsoft Office</a> presentation, powered by <a target="_blank" href="https://office.com/webapps">Office</a>.</iframe>
+
+  <button id="finishBtn" onclick="finishGame()">Finish</button>
+</div>
+
+<!-- Leaderboard Screen -->
+<div id="leaderboard" style="display:none;">
+  <h1>Leaderboard</h1>
+  <table id="leaderboardTable">
+    <tr><th>Rank</th><th>Name</th><th>Time (sec)</th></tr>
+  </table>
 </div>
 
 <script>
-const topics = {
-  "Simple Interest": [
-    { q: "What is simple interest?", a: "Simple interest is calculated with: I = P × R × T" },
-    { q: "What does P, R, and T mean?", a: "P = Principal, R = Rate, T = Time" },
-    { q: "How do I calculate interest?", a: "Multiply principal × rate × time. That gives the interest." },
-    { q: "How do I find the principal?", a: "Use: P = I ÷ (R × T)" },
-    { q: "What is interest rate?", a: "It’s the percentage used to calculate how much interest grows." }
-  ],
-  "Compound Interest": [
-    { q: "What is compound interest?", a: "Compound interest is interest added to the principal each time it’s calculated." },
-    { q: "How is compound interest different from simple interest?", a: "In compound interest, the interest keeps growing on itself. In simple interest, it's always on the original amount." },
-    { q: "What is the compound interest formula?", a: "A = P(1 + r/n)^(nt) where A is the total amount." }
-  ],
-  "Return on Investment (ROI)": [
-    { q: "What is ROI?", a: "ROI means Return on Investment (ROI). It shows how much profit you made compared to what you invested." },
-    { q: "How to calculate ROI?", a: "ROI = (Gain - Cost) ÷ Cost × 100%" },
-    { q: "Why is ROI important?", a: "It helps you compare different investments and make smart choices." }
-  ],
-  "Cost per Saving (CPS)": [
-    { q: "What is CPS?", a: "CPS means Cost per Saving (CPS). It’s how much you spend to achieve a certain saving." },
-    { q: "How do I calculate CPS?", a: "CPS = Total Cost ÷ Total Saving" },
-    { q: "Why is CPS useful?", a: "It helps you see which methods bring savings for the lowest cost." }
-  ],
-  "Game & Support": [
-    { q: "What is Dreamscape?", a: "It’s an AI math game with fun missions to solve real-life problems." },
-    { q: "What is the Bank Mission?", a: "It’s your challenge — solve interest and savings tasks to help Robo Guide." },
-    { q: "How do I earn a badge?", a: "Answer questions correctly to collect badge pieces and win!" },
-    { q: "I’m stuck", a: "CUSTOM_SHOW_MAIN_TOPICS" },
-    { q: "I don’t understand", a: "Try asking me: “How do I calculate interest?” or “What is ROI?”" },
-    { q: "Who are you?", a: "I’m Robo — your AI game guide in Dreamscape!" },
-    { q: "Can you help me?", a: "Yes! Ask me about interest, savings, ROI or anything in your mission." }
-  ]
-};
+/* ================= TIMER ================= */
+let startTime = null;
+let timerInterval = null;
+let timerRunning = false;
 
-function chooseTopic(topic) {
-  const messagesContainer = document.getElementById("chatMessages");
-  
-  const userMessage = document.createElement("div");
-  userMessage.classList.add("message", "sent");
-  userMessage.textContent = topic;
-  messagesContainer.appendChild(userMessage);
-  
-  setTimeout(() => {
-    const botMessage = document.createElement("div");
-    botMessage.classList.add("message", "received");
-    botMessage.innerHTML = `Choose a question: <br>`;
-    topics[topic].forEach(item => {
-      const btn = document.createElement("button");
-      btn.classList.add("question-button");
-      btn.textContent = item.q;
-      btn.onclick = () => {
-        if (item.a === "CUSTOM_SHOW_MAIN_TOPICS") {
-          selectQuestion(item.q, "CUSTOM_SHOW_MAIN_TOPICS");
-        } else {
-          selectQuestion(item.q, item.a);
-        }
-      };
-      botMessage.appendChild(btn);
-      botMessage.appendChild(document.createElement("br"));
-    });
-    messagesContainer.appendChild(botMessage);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }, 500);
-
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  startTime = Date.now();
+  const t = document.getElementById("timerDisplay");
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    t.textContent = `Time: ${elapsed}s`;
+  }, 100);
 }
 
-function selectQuestion(question, answer) {
-  const messagesContainer = document.getElementById("chatMessages");
-  
-  const userMessage = document.createElement("div");
-  userMessage.classList.add("message", "sent");
-  userMessage.textContent = question;
-  messagesContainer.appendChild(userMessage);
-  
-  setTimeout(() => {
-    if (answer === "CUSTOM_SHOW_MAIN_TOPICS") {
-      const botMessage1 = document.createElement("div");
-      botMessage1.classList.add("message", "received");
-      botMessage1.textContent = "That’s okay! Let’s try breaking down the formula together. What formula do you need?";
-      messagesContainer.appendChild(botMessage1);
+function stopTimerAndGetSeconds() {
+  if (!timerRunning || !startTime) return 0;
+  clearInterval(timerInterval);
+  timerRunning = false;
+  const total = ((Date.now() - startTime) / 1000).toFixed(2);
+  return parseFloat(total);
+}
+/* ========================================= */
 
-      showMainTopicButtons();
-    } else {
-      const botMessage = document.createElement("div");
-      botMessage.classList.add("message", "received");
-      botMessage.textContent = answer;
-      messagesContainer.appendChild(botMessage);
-    }
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }, 500);
-
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+function startGame() {
+  const name = document.getElementById("username").value.trim();
+  if (!name) { alert("Please enter your name!"); return; }
+  localStorage.setItem("currentPlayer", name);
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  // Timer will start via iSpring message OR the fallback button.
 }
 
-function showMainTopicButtons() {
-  const messagesContainer = document.getElementById("chatMessages");
-  
-  const botMessage = document.createElement("div");
-  botMessage.classList.add("message", "received");
-  botMessage.innerHTML = `Choose a topic you need help with: <br>`;
-  
-  ["Simple Interest", "Compound Interest", "Return on Investment (ROI)", "Cost per Saving (CPS)"].forEach(mainTopic => {
-    const btn = document.createElement("button");
-    btn.classList.add("question-button");
-    btn.textContent = mainTopic;
-    btn.onclick = () => chooseTopic(mainTopic);
-    botMessage.appendChild(btn);
-    botMessage.appendChild(document.createElement("br"));
+/* Fallback button (optional) */
+document.getElementById("startTimerBtn").addEventListener("click", () => {
+  startTimer();
+  document.getElementById("startTimerBtn").style.display = "none";
+});
+
+/* Leaderboard helpers */
+function saveToLeaderboard(name, seconds) {
+  let savedPlayers = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  savedPlayers.push({ name, time: seconds });
+  savedPlayers.sort((a, b) => a.time - b.time);
+  localStorage.setItem("leaderboard", JSON.stringify(savedPlayers));
+  return savedPlayers;
+}
+
+function finishGame() {
+  const name = localStorage.getItem("currentPlayer") || "Player";
+  const totalTime = stopTimerAndGetSeconds();
+  const savedPlayers = saveToLeaderboard(name, totalTime);
+
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("leaderboard").style.display = "flex";
+
+  const table = document.getElementById("leaderboardTable");
+  table.innerHTML = "<tr><th>Rank</th><th>Name</th><th>Time (sec)</th></tr>";
+  savedPlayers.forEach((player, index) => {
+    const row = table.insertRow();
+    row.insertCell(0).innerText = index + 1;
+    row.insertCell(1).innerText = player.name;
+    row.insertCell(2).innerText = player.time.toFixed(2);
   });
-  
-  messagesContainer.appendChild(botMessage);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
+/* ====== NEW: Listen for iSpring triggers via postMessage ======
+   From slide 11's click that jumps to slide 25, have iSpring send:
+   window.parent.postMessage({ startTimer: true }, "*");
+   And on the final slide:
+   window.parent.postMessage({ finishTimer: true }, "*");
+*/
+window.addEventListener("message", (e) => {
+  const data = e.data || {};
+  // If your iSpring is hosted on your own domain, add an origin check here.
+  if (data.startTimer) {
+    startTimer();
+    const btn = document.getElementById("startTimerBtn");
+    if (btn) btn.style.display = "none";
+  }
+  if (data.finishTimer) {
+    // Stop and optionally auto-finish
+    const total = stopTimerAndGetSeconds();
+    console.log("Timer stopped via iSpring:", total, "seconds");
+    // Auto-show leaderboard (uncomment if you want this behavior)
+    // finishGame();
+  }
+});
+/* ============================================================= */
 </script>
 
 </body>
