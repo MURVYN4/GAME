@@ -1,3 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Robo Guide Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 380px;
+      height: 600px;
+      background: white;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .chat-header {
+      background: #0078ff;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    .message.sent {
+      background: #0078ff;
+      color: white;
+      align-self: flex-end;
+    }
+    .message.received {
+      background: #e0e0e0;
+      align-self: flex-start;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background: #fff;
+    }
+    .options button, .question-button {
+      flex: 1 1 calc(50% - 5px);
+      background: #0078ff;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .options button:hover, .question-button:hover {
+      background: #005ec2;
+    }
+    .question-button {
+      margin: 5px 0;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Robo Guide Chatbot</div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message received">Hi! Choose a topic below to get started.</div>
+  </div>
+  <div class="options" id="mainOptions">
+    <button onclick="chooseTopic('Simple Interest')">📈 Simple Interest</button>
+    <button onclick="chooseTopic('Compound Interest')">💹 Compound Interest</button>
+    <button onclick="chooseTopic('Return on Investment (ROI)')">💵 Return on Investment (ROI)</button>
+    <button onclick="chooseTopic('Cost per Saving (CPS)')">💰 Cost per Saving (CPS)</button>
+    <button onclick="chooseTopic('Game & Support')">🎮 Game & Support</button>
+  </div>
+</div>
+
+<script>
+const topics = {
+  "Simple Interest": [
+    { q: "What is simple interest?", a: "Simple interest is calculated with: I = P × R × T" },
+    { q: "What does P, R, and T mean?", a: "P = Principal, R = Rate, T = Time" },
+    { q: "How do I calculate interest?", a: "Multiply principal × rate × time. That gives the interest." },
+    { q: "How do I find the principal?", a: "Use: P = I ÷ (R × T)" },
+    { q: "What is interest rate?", a: "It’s the percentage used to calculate how much interest grows." }
+  ],
+  "Compound Interest": [
+    { q: "What is compound interest?", a: "Compound interest is interest added to the principal each time it’s calculated." },
+    { q: "How is compound interest different from simple interest?", a: "In compound interest, the interest keeps growing on itself. In simple interest, it's always on the original amount." },
+    { q: "What is the compound interest formula?", a: "A = P(1 + r/n)^(nt) where A is the total amount." }
+  ],
+  "Return on Investment (ROI)": [
+    { q: "What is ROI?", a: "ROI means Return on Investment (ROI). It shows how much profit you made compared to what you invested." },
+    { q: "How to calculate ROI?", a: "ROI = (Gain - Cost) ÷ Cost × 100%" },
+    { q: "Why is ROI important?", a: "It helps you compare different investments and make smart choices." }
+  ],
+  "Cost per Saving (CPS)": [
+    { q: "What is CPS?", a: "CPS means Cost per Saving (CPS). It’s how much you spend to achieve a certain saving." },
+    { q: "How do I calculate CPS?", a: "CPS = Total Cost ÷ Total Saving" },
+    { q: "Why is CPS useful?", a: "It helps you see which methods bring savings for the lowest cost." }
+  ],
+  "Game & Support": [
+    { q: "What is Dreamscape?", a: "It’s an AI math game with fun missions to solve real-life problems." },
+    { q: "What is the Bank Mission?", a: "It’s your challenge — solve interest and savings tasks to help Robo Guide." },
+    { q: "How do I earn a badge?", a: "Answer questions correctly to collect badge pieces and win!" },
+    { q: "I’m stuck", a: "CUSTOM_SHOW_MAIN_TOPICS" },
+    { q: "I don’t understand", a: "Try asking me: “How do I calculate interest?” or “What is ROI?”" },
+    { q: "Who are you?", a: "I’m Robo — your AI game guide in Dreamscape!" },
+    { q: "Can you help me?", a: "Yes! Ask me about interest, savings, ROI or anything in your mission." }
+  ]
+};
+
+function chooseTopic(topic) {
+  const messagesContainer = document.getElementById("chatMessages");
+  
+  const userMessage = document.createElement("div");
+  userMessage.classList.add("message", "sent");
+  userMessage.textContent = topic;
+  messagesContainer.appendChild(userMessage);
+  
+  setTimeout(() => {
+    const botMessage = document.createElement("div");
+    botMessage.classList.add("message", "received");
+    botMessage.innerHTML = `Choose a question: <br>`;
+    topics[topic].forEach(item => {
+      const btn = document.createElement("button");
+      btn.classList.add("question-button");
+      btn.textContent = item.q;
+      btn.onclick = () => {
+        if (item.a === "CUSTOM_SHOW_MAIN_TOPICS") {
+          selectQuestion(item.q, "CUSTOM_SHOW_MAIN_TOPICS");
+        } else {
+          selectQuestion(item.q, item.a);
+        }
+      };
+      botMessage.appendChild(btn);
+      botMessage.appendChild(document.createElement("br"));
+    });
+    messagesContainer.appendChild(botMessage);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }, 500);
+
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function selectQuestion(question, answer) {
+  const messagesContainer = document.getElementById("chatMessages");
+  
+  const userMessage = document.createElement("div");
+  userMessage.classList.add("message", "sent");
+  userMessage.textContent = question;
+  messagesContainer.appendChild(userMessage);
+  
+  setTimeout(() => {
+    if (answer === "CUSTOM_SHOW_MAIN_TOPICS") {
+      const botMessage1 = document.createElement("div");
+      botMessage1.classList.add("message", "received");
+      botMessage1.textContent = "That’s okay! Let’s try breaking down the formula together. What formula do you need?";
+      messagesContainer.appendChild(botMessage1);
+
+      showMainTopicButtons();
+    } else {
+      const botMessage = document.createElement("div");
+      botMessage.classList.add("message", "received");
+      botMessage.textContent = answer;
+      messagesContainer.appendChild(botMessage);
+    }
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }, 500);
+
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function showMainTopicButtons() {
+  const messagesContainer = document.getElementById("chatMessages");
+  
+  const botMessage = document.createElement("div");
+  botMessage.classList.add("message", "received");
+  botMessage.innerHTML = `Choose a topic you need help with: <br>`;
+  
+  ["Simple Interest", "Compound Interest", "Return on Investment (ROI)", "Cost per Saving (CPS)"].forEach(mainTopic => {
+    const btn = document.createElement("button");
+    btn.classList.add("question-button");
+    btn.textContent = mainTopic;
+    btn.onclick = () => chooseTopic(mainTopic);
+    botMessage.appendChild(btn);
+    botMessage.appendChild(document.createElement("br"));
+  });
+  
+  messagesContainer.appendChild(botMessage);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+</script>
+<button id="backToGame"
+  style="position:fixed; right:12px; bottom:12px; padding:8px 12px; border:0;
+         border-radius:999px; background:#111827; color:#fff; font:600 14px system-ui;
+         box-shadow:0 6px 18px rgba(0,0,0,.25); cursor:pointer; z-index:9999;">
+  ⟵ Back to Game
+</button>
+
+<script>
+  (function() {
+    function getParam(name){
+      const m = new URLSearchParams(location.search).get(name);
+      return m ? decodeURIComponent(m) : "";
+    }
+    const fallback = getParam("return");
+
+    function goBackToGame() {
+      // If this tab was opened from the course, close and focus the course
+      if (window.opener && !window.opener.closed) {
+        try { window.opener.focus(); } catch(_) {}
+        window.close();
+        return;
+      }
+      // If browser history exists, go back
+      if (document.referrer || history.length > 1) {
+        history.back();
+        return;
+      }
+      // If return URL was provided, go there
+      if (fallback) {
+        location.href = fallback;
+        return;
+      }
+      // Last resort
+      alert("Please return to your course tab.");
+    }
+
+    document.getElementById("backToGame").addEventListener("click", goBackToGame);
+  })();
+</script>
+
+</body>
+</html>
+
 <script>
 /* ---------- Chatbox Return Helper (drop-in) ---------- */
 (function () {
