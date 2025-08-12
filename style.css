@@ -1,1 +1,113 @@
+<style>
+  /* Reset & base */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+  }
 
+  /* Centered login and leaderboard screens */
+  #loginScreen, #leaderboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(135deg, #111, #222);
+    position: absolute;
+    top: 0; left: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  #gameScreen {
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    background: #000;
+  }
+
+  input, button {
+    padding: 10px 15px;
+    font-size: 16px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: none;
+  }
+
+  input {
+    width: 220px;
+    text-align: center;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+  }
+
+  button {
+    background: #39d6f4;
+    color: #001018;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #0a2c36;
+    transition: transform 0.1s;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+
+  table {
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #111;
+  }
+
+  table, th, td {
+    border: 1px solid #fff;
+    padding: 8px 12px;
+  }
+
+  th {
+    background: #39d6f4;
+    color: #000;
+  }
+
+  /* HUD elements */
+  #timerDisplay {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.7);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 18px;
+    z-index: 10;
+  }
+
+  #finishBtn {
+    position: absolute;
+    top: 10px; right: 10px;
+    z-index: 10;
+  }
+
+  /* Optional Start Timer button */
+  #startTimerBtn {
+    position: absolute;
+    top: 50px; left: 10px;
+    z-index: 11;
+  }
+
+  iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
