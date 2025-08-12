@@ -212,6 +212,45 @@ function showMainTopicButtons() {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 </script>
+<button id="backToGame"
+  style="position:fixed; right:12px; bottom:12px; padding:8px 12px; border:0;
+         border-radius:999px; background:#111827; color:#fff; font:600 14px system-ui;
+         box-shadow:0 6px 18px rgba(0,0,0,.25); cursor:pointer; z-index:9999;">
+  ⟵ Back to Game
+</button>
+
+<script>
+  (function() {
+    function getParam(name){
+      const m = new URLSearchParams(location.search).get(name);
+      return m ? decodeURIComponent(m) : "";
+    }
+    const fallback = getParam("return");
+
+    function goBackToGame() {
+      // If this tab was opened from the course, close and focus the course
+      if (window.opener && !window.opener.closed) {
+        try { window.opener.focus(); } catch(_) {}
+        window.close();
+        return;
+      }
+      // If browser history exists, go back
+      if (document.referrer || history.length > 1) {
+        history.back();
+        return;
+      }
+      // If return URL was provided, go there
+      if (fallback) {
+        location.href = fallback;
+        return;
+      }
+      // Last resort
+      alert("Please return to your course tab.");
+    }
+
+    document.getElementById("backToGame").addEventListener("click", goBackToGame);
+  })();
+</script>
 
 </body>
 </html>
